@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 )
@@ -10,7 +11,12 @@ func handlerLogin(s *state, cmd command) error {
 		return errors.New("expecting one argument")
 	}
 
-	err := s.config.SetUser(cmd.args[0])
+	_, err := s.db.GetUser(context.Background(), cmd.args[0])
+	if err != nil {
+		return err
+	}
+
+	err = s.config.SetUser(cmd.args[0])
 	if err != nil {
 		return err
 	}
