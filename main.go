@@ -15,7 +15,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to read config: %v", err)
 	}
-	cfg.RSSURL = "https://www.wagslane.dev/index.xml"
 
 	db, err := sql.Open("postgres", cfg.DbURL)
 	if err != nil {
