@@ -3,14 +3,21 @@
 Command line interface for aggregating RSS feeds. View recent posts from feeds you have added or follow.
 Register separate users, each having their own feeds following list.
 
-Requires Postgres and Go installed to run.
+Requires a local Postgres database and the Go toolchain installed to run.
 
 ### Install the gator CLI using
-`go install github.com/pouyannc/rss_aggregator@latest`
+```bash
+go install github.com/pouyannc/rss_aggregator@latest
+```
 
 Create a JSON config file in your home directory called ".gatorconfig.json".
 Input the following fields into the config file:
-`{"db_url":"postgres://postgres:postgres@localhost:5432/gator?sslmode=disable","current_user_name":""}`
+```json
+{
+    "db_url":"postgres://username:@localhost:5432/database?sslmode=disable"
+}
+```
+The value should be your local database connection string.
 
 ### To run the program:
 `rss_aggregator <command> [arguments]`
