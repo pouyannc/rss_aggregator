@@ -2,9 +2,13 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/pouyannc/rss_aggregator/internal/database"
 )
 
 func handlerAgg(s *state, cmd command) error {
@@ -43,11 +47,36 @@ func scrapeFeeds(s *state) error {
 		return err
 	}
 
-	fmt.Printf("Fetched from %s\n", nextFeed.Name)
-	fmt.Println("List of titles:")
+	fmt.Printf("Fetched from feed %s\n", nextFeed.Name)
+	fmt.Println("Saving posts...")
 	for _, item := range feed.Channel.Item {
-		fmt.Printf("- %s\n", item.Title)
+		publishedAt := sql.NullTime{}
+		if t, err := time.Parse(time.RFC1123Z, item.PubDate); err == nil {
+			publishedAt = sql.NullTime{
+				Time:  t,
+				Valid: true,
+			}
+		}
+
+		_, err = s.db.CreatePost(context.Background(), database.CreatePostParams{
+			ID:        uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Title:     item.Title,
+			Url:       item.Link,
+			Description: sql.NullString{
+				String: item.Description,
+				Valid:  true,
+			},
+			PublishedAt: publishedAt,
+			FeedID:      nextFeed.ID,
+		})
+
+		if err != nil {
+			return err
+		}
 	}
+	fmt.Println("Saved posts!")
 
 	return nil
 }
